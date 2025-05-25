@@ -42,4 +42,4 @@ next-env.d.ts
 
 .vscode/
 
-/types/generated
+backend/types/generated/

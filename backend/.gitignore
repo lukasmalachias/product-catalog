@@ -114,3 +114,6 @@ build
 .strapi-updater.json
 
 .vscode/
+
+/types/generated
+.strapi/
