@@ -1,9 +1,10 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { Product } from "../page";
-import { ArrowLeft, Check, Pencil, Save, Trash2, Loader2, Plus } from "lucide-react";
+import { Pencil, Trash2, Plus } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Toaster, toast } from "react-hot-toast";
+import ProductForm from "./ProductForm";
+import { Product } from "../types/product";
 
 interface ProductPageProps {
   itens: Product[];
@@ -11,12 +12,22 @@ interface ProductPageProps {
 
 export default function ProductCard({ itens }: ProductPageProps) {
   const [products, setProducts] = useState(itens);
-  const [editingProductId, setEditingProductId] = useState<number | null>(null);
+  const [editingProductId, setEditingProductId] = useState<number | null | string>(null);
   const [editedProduct, setEditedProduct] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    if (editingProductId !== null) {
+    if (editingProductId === "create") {
+      setEditedProduct([{
+        id: Date.now(),
+        attributes: {
+          name: "",
+          description: "",
+          price: 0,
+          available: true,
+        }
+      }]);
+    } else if (editingProductId !== null && typeof editingProductId === "number") {
       const productToEdit = products.find((p) => p.id === editingProductId);
       if (productToEdit) {
         setEditedProduct([{ ...productToEdit }]);
@@ -28,6 +39,10 @@ export default function ProductCard({ itens }: ProductPageProps) {
 
   function handleEdit(idProduct: number) {
     setEditingProductId(idProduct);
+  }
+
+  function createProduct(create: string) {
+    setEditingProductId(create);
   }
 
   function handleChange(id: number, field: string, value: any) {
@@ -51,27 +66,46 @@ export default function ProductCard({ itens }: ProductPageProps) {
     if (!edited) return;
 
     const { name, description, price, available } = edited.attributes;
-    const updatedData = {
+    const data = {
       data: { name, description, price, available },
     };
 
     try {
       setIsLoading(true);
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/products/${id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(updatedData),
-      });
-      setIsLoading(false);
-      if (!res.ok) throw new Error("Erro ao atualizar");
 
-      setProducts((prev) => prev.map((p) => (p.id === id ? edited : p)));
-      toast.success("Produto atualizado com sucesso!");
+      const isCreating = editingProductId === "create";
+      const url = isCreating
+        ? `${process.env.NEXT_PUBLIC_API_URL}/api/products`
+        : `${process.env.NEXT_PUBLIC_API_URL}/api/products/${id}`;
+
+      const method = isCreating ? "POST" : "PUT";
+
+      const res = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+
+      setIsLoading(false);
+
+      if (!res.ok) throw new Error("Erro na requisição");
+
+      const responseJson = await res.json();
+      const newProduct = responseJson.data;
+
+      if (isCreating) {
+        setProducts((prev) => [...prev, newProduct]);
+        toast.success("Produto criado com sucesso!");
+      } else {
+        setProducts((prev) => prev.map((p) => (p.id === id ? edited : p)));
+        toast.success("Produto atualizado com sucesso!");
+      }
+
       setEditingProductId(null);
     } catch (error) {
       setIsLoading(false);
-      console.error("Erro ao atualizar produto:", error);
-      toast.error("Erro ao atualizar o produto.");
+      console.error("Erro ao salvar produto:", error);
+      toast.error("Erro ao salvar o produto.");
     }
   }
 
@@ -104,7 +138,7 @@ export default function ProductCard({ itens }: ProductPageProps) {
             <div className="flex justify-end mb-5">
               <button
                 className="cursor-pointer flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-2xl hover:bg-blue-700 transition"
-                // onClick={() => {}}
+                onClick={() => {createProduct("create")}}
               >
                 <Plus size={18} />
                 Adicionar
@@ -154,7 +188,7 @@ export default function ProductCard({ itens }: ProductPageProps) {
             exit={{ opacity: 0 }}
             className="min-h-screen bg-gray-50 dark:bg-gray-900 px-4 py-8 sm:px-6 lg:px-8"
           >
-            <div className="flex mb-5">
+            {/* <div className="flex mb-5">
               <button
                 onClick={() => setEditingProductId(null)}
                 className="cursor-pointer flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-2xl hover:bg-blue-700 transition"
@@ -225,7 +259,14 @@ export default function ProductCard({ itens }: ProductPageProps) {
                   </div>
                 </motion.div>
               ))}
-            </div>
+            </div> */}
+            <ProductForm
+              isLoading={isLoading}
+              editedProduct={editedProduct}
+              handleChange={handleChange}
+              handleSave={handleSave}
+              setEditingProductId={setEditingProductId}
+              />
           </motion.main>
         )}
       </AnimatePresence>

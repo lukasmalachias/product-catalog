@@ -4,16 +4,7 @@ import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Toaster, toast } from "react-hot-toast";
 import ProductCard from "../app/components/ProductCard";
-
-export type Product = {
-  id: number;
-  attributes: {
-    name: string;
-    description: string;
-    price: number;
-    available: boolean;
-  };
-};
+import { Product } from "./types/product";
 
 export default function ProductsPage() {
   const [products, setProducts] = useState<Product[] | null>(null);
