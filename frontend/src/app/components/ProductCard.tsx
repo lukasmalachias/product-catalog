@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { Product } from "../page";
-import { ArrowLeft, Check, Pencil, Save, Trash2, Loader2 } from "lucide-react";
+import { ArrowLeft, Check, Pencil, Save, Trash2, Loader2, Plus } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Toaster, toast } from "react-hot-toast";
 
@@ -101,6 +101,15 @@ export default function ProductCard({ itens }: ProductPageProps) {
             exit={{ opacity: 0 }}
             className="bg-gray-50 dark:bg-gray-900 px-4 py-8 sm:px-6 lg:px-8 rounded-md"
           >
+            <div className="flex justify-end mb-5">
+              <button
+                className="cursor-pointer flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-2xl hover:bg-blue-700 transition"
+                // onClick={() => {}}
+              >
+                <Plus size={18} />
+                Adicionar
+              </button>
+            </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
               {products.map((item) => (
                 <motion.div
@@ -128,10 +137,10 @@ export default function ProductCard({ itens }: ProductPageProps) {
                   )}
                   <div className="flex justify-end gap-4 mt-6">
                     <button onClick={() => handleEdit(item.id)} title="Editar">
-                      <Pencil className="w-5 h-5 text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 transition" />
+                      <Pencil className="cursor-pointer w-5 h-5 text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 transition" />
                     </button>
                     <button onClick={() => handleDelete(item.id)} title="Excluir">
-                      <Trash2 className="w-5 h-5 text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 transition" />
+                      <Trash2 className="cursor-pointer w-5 h-5 text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 transition" />
                     </button>
                   </div>
                 </motion.div>
@@ -145,13 +154,12 @@ export default function ProductCard({ itens }: ProductPageProps) {
             exit={{ opacity: 0 }}
             className="min-h-screen bg-gray-50 dark:bg-gray-900 px-4 py-8 sm:px-6 lg:px-8"
           >
-            <div className="mb-6">
+            <div className="flex mb-5">
               <button
                 onClick={() => setEditingProductId(null)}
-                className="flex items-center text-blue-600 hover:underline text-sm dark:text-blue-400"
+                className="cursor-pointer flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-2xl hover:bg-blue-700 transition"
               >
-                <ArrowLeft className="w-4 h-4 mr-1" />
-                Voltar para listagem
+                <ArrowLeft className="w-4 h-4" />
               </button>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
@@ -205,7 +213,7 @@ export default function ProductCard({ itens }: ProductPageProps) {
                     <button
                       onClick={() => handleSave(item.id)}
                       disabled={isLoading}
-                      className="flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white font-medium px-4 py-2 rounded-xl shadow transition disabled:opacity-60 disabled:cursor-not-allowed"
+                      className="cursor-pointer flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white font-medium px-4 py-2 rounded-xl shadow transition disabled:opacity-60 disabled:cursor-not-allowed"
                     >
                       {isLoading ? (
                         <Loader2 className="w-4 h-4 animate-spin" />
